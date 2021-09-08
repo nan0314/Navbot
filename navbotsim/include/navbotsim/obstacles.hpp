@@ -1,7 +1,8 @@
-#ifndef RIGID2D_INCLUDE_GUARD_HPP
-#define RIGID2D_INCLUDE_GUARD_HPP
 /// \file
-/// \brief Library for two-dimensional rigid body transformations.
+/// \brief Library for setting up navbot environment obstacles.
+
+#ifndef OBSTACLES_INCLUDE_GUARD_HPP
+#define OBSTACLES_INCLUDE_GUARD_HPP
 
 #include <geometry_msgs/Quaternion.h>
 #include "std_msgs/ColorRGBA.h"

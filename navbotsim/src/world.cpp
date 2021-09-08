@@ -32,6 +32,9 @@ int main(int argc, char **argv)
     visualization_msgs::MarkerArray known_msg = obstacles::known_obstacles("world");
     visualization_msgs::MarkerArray unknown_msg = obstacles::unknown_obstacles("world",10);
 
+    // Run A*
+    
+
     ros::Rate loop_rate(10);
 
     while (ros::ok())
