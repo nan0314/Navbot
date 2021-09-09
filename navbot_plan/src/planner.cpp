@@ -40,8 +40,9 @@ int main(int argc, char **argv)
         ros::spinOnce();
     }
 
-    // run A*
-    vector<vector<double>> points = a_star({30,30,5},{-30,-30,5},obstacles,2);
+    // Find initial path
+    vector<vector<double>> points = theta_star({30,30,5},{-30,-30,5},obstacles,5);
+
     nav_msgs::Path path = nav_path(points,"world");
 
     while (ros::ok())

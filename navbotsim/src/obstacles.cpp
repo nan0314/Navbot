@@ -72,16 +72,16 @@ namespace obstacles{
         srand ( time(NULL) );
 
         unknown.markers.push_back(create(14,-5,0,5,5,29,false,frame,16));
-        unknown.markers.push_back(create(0,-9,15,5,14,6,false,frame,17));
-        unknown.markers.push_back(create(-10,9,10,14,5,12,false,frame,18));
+        unknown.markers.push_back(create(0,-9,3,5,14,20,false,frame,17));
+        unknown.markers.push_back(create(-10,9,3,14,5,20,false,frame,18));
 
         int x,y,z;
         for (int i = 0; i<random; i++){
             x = rand() % 40 - 20;
             y = rand() % 40 - 20;
-            z = rand() % 25 + 10;
+            z = rand() % 15 + 10;
 
-            unknown.markers.push_back(create(x,y,z,2,2,2,false,frame,19+i));
+            unknown.markers.push_back(create(x,y,z,3,3,3,false,frame,19+i));
 
         }
 

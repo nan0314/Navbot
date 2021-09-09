@@ -103,6 +103,9 @@ namespace navbot_plan{
     /// \return vector of points between a and b-- include b
     vector<vector<double>> interpolate(const vector<double> &a, const vector<double> &b, const int &N);
 
+
+    bool cmp(Node* a, Node* b);
+    
     /// \brief finds the optimal path between start and end, avoiding obstacles.
     /// \param start - starting point of path
     /// \param end - end point of path
@@ -110,6 +113,25 @@ namespace navbot_plan{
     /// \param step - distance between nodes in the path.
     /// \return vector of points that form the optimal path
     vector<vector<double>> a_star(const vector<double> &start, const vector<double> &end, 
+    const visualization_msgs::MarkerArray &obstacles, const double &step);
+
+    /// \brief performs A* with active pruning at each node.
+    /// \param start - starting point of path
+    /// \param end - end point of path
+    /// \param obstacles - invalid locations for the path to cross
+    /// \param step - distance between nodes in the path.
+    /// \return vector of points that form the optimal path
+    vector<vector<double>> theta_star(const vector<double> &start, const vector<double> &end, 
+    const visualization_msgs::MarkerArray &obstacles, const double &step);
+
+    /// \brief performs theta* assuming line of sight between parent/child nodes.
+    ///        checks line of sight when node is expanded.
+    /// \param start - starting point of path
+    /// \param end - end point of path
+    /// \param obstacles - invalid locations for the path to cross
+    /// \param step - distance between nodes in the path.
+    /// \return vector of points that form the optimal path
+    vector<vector<double>> lazy_theta_star(const vector<double> &start, const vector<double> &end, 
     const visualization_msgs::MarkerArray &obstacles, const double &step);
 
     /// \brief converts a path represented by a vector<vector<double>
