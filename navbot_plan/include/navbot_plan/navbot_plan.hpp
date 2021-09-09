@@ -37,7 +37,7 @@ namespace navbot_plan{
         ///        the pos and parent member variables
         /// \param pos - node position
         /// \param parent - points to the parent node
-        Node(vector<double> pos, Node *parent);
+        Node(const vector<double> &pos, Node *parent);
 
         /// \brief Constructor - creates a Node object initializing all
         ///        member variables
@@ -46,12 +46,12 @@ namespace navbot_plan{
         /// \param g - cost of path up to this node
         /// \param h - hueristic future cost estimate
         /// \param parent - points to the parent node
-        Node(vector<double> pos, double f, double g, double h, Node *parent);
+        Node(const vector<double> &pos, const double &f, const double &g, const double &h, Node *parent);
 
         /// \brief Compares the cost of two nodes
         /// \param right - input node to compare to
         /// \return true if node has lower cost than input node
-        bool operator<(Node right);
+        bool operator<(const Node &right);
 
         /// \brief Returns the path of points from start to this node
         /// \return path from start to node
@@ -63,7 +63,7 @@ namespace navbot_plan{
         /// \param obstacles - invalid locations for nodes
         /// \param step - distance between node and successors
         /// \return maximum of 26 valid successor 
-        vector<vector<double>> getSuccessors(visualization_msgs::MarkerArray obstacles, double step);
+        vector<vector<double>> getSuccessors(const visualization_msgs::MarkerArray &obstacles, const double &step);
 
         /// \brief Checks to see if a given point in space is a valid successor. Splits
         ///        the line between the node and point into segments of length dp, checking
@@ -72,7 +72,7 @@ namespace navbot_plan{
         /// \param point - point to check valid or not valid
         /// \param dp - length between checked endpoints
         /// \returns true if no endpoints (including point) are within an obstacle
-        bool valid_successor(visualization_msgs::MarkerArray obstacles, vector<double> point, double dp);
+        bool valid_successor(const visualization_msgs::MarkerArray &obstacles, const vector<double> &point, const double &dp);
 
         /// \brief Outputs the position of a node as a string
         /// \return position of node
@@ -82,26 +82,26 @@ namespace navbot_plan{
 
     /// \brief Takes an input position vector and returns it as a string
     /// \return outputs position "pos[0] pos[1] ... pos[n]"
-    std::string to_string(vector<double> pos);
+    std::string to_string(const vector<double> &pos);
 
     /// \brief Calculates euclidean distance between two points
     /// \param a - vector representing a point
     /// \param b - vector representing a second point
     /// \return distance between two points
-    double distance(vector<double> a, vector<double> b);
+    double distance(const vector<double> &a, const vector<double> &b);
 
     /// \brief Checks if a point is within an invalid location with a 10% buffer for safety. 
     /// \param obstacle - invalid location bounding box
     /// \param point - point to check
     /// \return true if point not in obstacle
-    bool is_valid(visualization_msgs::Marker obstacle, vector<double> point);
+    bool is_valid(const visualization_msgs::Marker &obstacle, const vector<double> &point);
 
     /// \brief creates N-1 vector of points evenly spaced along line between points
     ///        a and b
     /// \param a - start of line for interpolation
     /// \param b - end of line for interpolation
     /// \return vector of points between a and b-- include b
-    vector<vector<double>> interpolate(vector<double> a, vector<double> b, int N);
+    vector<vector<double>> interpolate(const vector<double> &a, const vector<double> &b, const int &N);
 
     /// \brief finds the optimal path between start and end, avoiding obstacles.
     /// \param start - starting point of path
@@ -109,13 +109,14 @@ namespace navbot_plan{
     /// \param obstacles - invalid locations for the path to cross
     /// \param step - distance between nodes in the path.
     /// \return vector of points that form the optimal path
-    vector<vector<double>> a_star(vector<double> start, vector<double> end, visualization_msgs::MarkerArray obstacles, double step);
+    vector<vector<double>> a_star(const vector<double> &start, const vector<double> &end, 
+    const visualization_msgs::MarkerArray &obstacles, const double &step);
 
     /// \brief converts a path represented by a vector<vector<double>
     ///        into a nav_msgs::Path
     /// \param path - vector containing path of points {x,y,z}
     /// \return same path represented as poses in a nav_msgs::Path
-    nav_msgs::Path nav_path(vector<vector<double>> path, std::string frame);
+    nav_msgs::Path nav_path(const vector<vector<double>> &path, const std::string &frame);
 
 }
 

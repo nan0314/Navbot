@@ -10,9 +10,9 @@ namespace navbot_plan{
 
     Node::Node(Node* node) : pos{node->pos}, f{node->f}, g{node->g}, h{node->h}, parent{node->parent} {}
 
-    Node::Node(std::vector<double> pos, Node *parent) : pos{pos}, parent{parent} {}
+    Node::Node(const vector<double> &pos, Node *parent) : pos{pos}, parent{parent} {}
 
-    Node::Node(std::vector<double> pos, double f, double g, double h, Node *parent) : 
+    Node::Node(const vector<double> &pos, const double &f, const double &g, const double &h, Node *parent) : 
         pos{pos}, f{f}, g{g}, h{h}, parent{parent} {}
 
     vector<vector<double>> Node::getPath(){
@@ -28,7 +28,7 @@ namespace navbot_plan{
         return path;
     }
 
-    vector<vector<double>> Node::getSuccessors(visualization_msgs::MarkerArray obstacles, double step){
+    vector<vector<double>> Node::getSuccessors(const visualization_msgs::MarkerArray &obstacles, const double &step){
 
         vector<vector<double>> successors;
 
@@ -52,7 +52,7 @@ namespace navbot_plan{
         return successors;
     }
 
-    bool Node::valid_successor(visualization_msgs::MarkerArray obstacles, vector<double> point, double dp){
+    bool Node::valid_successor(const visualization_msgs::MarkerArray &obstacles, const vector<double> &point, const double &dp){
 
         // calculate distance between node and new point
         double dist = distance(pos,point);
@@ -76,7 +76,7 @@ namespace navbot_plan{
 
     }
 
-    bool Node::operator < (Node right){
+    bool Node::operator < (const Node &right){
         return f < right.f;
     }
 
@@ -90,7 +90,7 @@ namespace navbot_plan{
     // General Functions
     ////////////////////////////
 
-    std::string to_string(vector<double> pos){
+    std::string to_string(const vector<double> &pos){
         std::string out = "";
         for (auto p : pos){
             out += std::to_string(p) + " ";
@@ -98,7 +98,7 @@ namespace navbot_plan{
         return out;
     }
 
-    double distance(vector<double> a, vector<double> b){
+    double distance(const vector<double> &a, const vector<double> &b){
 
         double out = 0;
         for (int i = 0; i < a.size(); i++){
@@ -108,7 +108,7 @@ namespace navbot_plan{
         return sqrt(out);
     }
 
-    bool is_valid(visualization_msgs::Marker obstacle, vector<double> point){
+    bool is_valid(const visualization_msgs::Marker &obstacle, const vector<double> &point){
 
         // Calculate bounds for each dimension with 10% buffer
         double x_lower = obstacle.pose.position.x - 1.1*obstacle.scale.x/2;
@@ -130,7 +130,7 @@ namespace navbot_plan{
 
     }
 
-    vector<vector<double>> interpolate(vector<double> a, vector<double> b, int N){
+    vector<vector<double>> interpolate(const vector<double> &a, const vector<double> &b, const int &N){
 
         // x,y,z single step sizes for point interpolation
         double dx = (a[0] - b[0])/N;
@@ -150,7 +150,8 @@ namespace navbot_plan{
 
     }
 
-    vector<vector<double>> a_star(vector<double> start, vector<double> end,visualization_msgs::MarkerArray obstacles, double step){
+    vector<vector<double>> a_star(const vector<double> &start, const vector<double> &end, 
+    const visualization_msgs::MarkerArray &obstacles, const double &step){
 
         using std::set;
         using std::string;
@@ -245,7 +246,7 @@ namespace navbot_plan{
         return path;
     }
 
-    nav_msgs::Path nav_path(vector<vector<double>> path, std::string frame){
+    nav_msgs::Path nav_path(const vector<vector<double>> &path, const std::string &frame){
 
         geometry_msgs::PoseStamped pose;
         nav_msgs::Path poses;
