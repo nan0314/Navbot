@@ -30,6 +30,7 @@ TODO
 
 ## TODO
 
+* Improve line of sight function (navbot_plan library)
 * Finish planning and flight control
 
 ## Authors
