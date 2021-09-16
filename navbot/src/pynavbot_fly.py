@@ -1,28 +1,62 @@
 #!/usr/bin/env python
 import rospy
 import std_msgs
-import tf
 import geometry_msgs
 import nav_msgs
+import tf_conversions
 from std_msgs.msg import String
-from geometry_msgs.msg import Pose
-from nav_msgs.msg import Odometry
+from geometry_msgs.msg import TransformStamped
+from nav_msgs.msg import Path
+from geometry_msgs.msg import PoseStamped
 import numpy as np
 import cvxpy as cvx
 import scipy
+import tf2_ros
 from scipy.integrate import odeint
 from dynamics import navbot
 from MPC import MPC
-    
+
+def handle_pose(x):
+
+    pose = PoseStamped()
+    pose.header.frame_id="world"
+
+    br = tf2_ros.TransformBroadcaster()
+    t = TransformStamped()
+
+    t.header.stamp = rospy.Time.now()
+    t.header.frame_id = "world"
+    t.child_frame_id = "navbot"
+    t.transform.translation.x = x[0]
+    t.transform.translation.y = x[1]
+    t.transform.translation.z = x[2]
+    q = tf_conversions.transformations.quaternion_from_euler(x[6], x[7], x[8])
+    t.transform.rotation.x = q[0]
+    t.transform.rotation.y = q[1]
+    t.transform.rotation.z = q[2]
+    t.transform.rotation.w = q[3]
+
+    br.sendTransform(t)
+
+    pose.pose.position.x = x[0]
+    pose.pose.position.y = x[1]
+    pose.pose.position.z = x[2]
+    pose.pose.orientation.x = q[0]
+    pose.pose.orientation.y = q[1]
+    pose.pose.orientation.z = q[2]
+    pose.pose.orientation.w = q[3]
+
+    return pose
+
+
 
 def pynavbot_fly():
-    pose_pub = rospy.Publisher('pose', Odometry, queue_size=10)
+    path_pub = rospy.Publisher('navbot_path', Path, queue_size=10)
     rospy.init_node('pynavbot_fly', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
-    pose_msg = Odometry()
-
-    pose_msg.header.frame_id = "world"
+    path_msg = Path()
+    path_msg.header.frame_id = "world"
 
     # initialize state and control
     xu =  [30,30,5,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -34,19 +68,13 @@ def pynavbot_fly():
 
     # set up linear model
     model = navbot()
-    controller = MPC()
+    controller = MPC(dt=dt)
 
     # send initial pose
-    quaternion = tf.transformations.quaternion_from_euler(xu[6], xu[7], xu[8])
-    pose_msg.pose.pose.position.x = xu[0]
-    pose_msg.pose.pose.position.y = xu[1]
-    pose_msg.pose.pose.position.z = xu[2]
-    pose_msg.pose.pose.orientation.x = quaternion[0]
-    pose_msg.pose.pose.orientation.y = quaternion[1]
-    pose_msg.pose.pose.orientation.z = quaternion[2]
-    pose_msg.pose.pose.orientation.w = quaternion[3]
-
-    pose_pub.publish(pose_msg)
+    pose = handle_pose(xu)
+    path_msg.poses.append(pose)
+    path_pub.publish(path_msg)
+    path_pub.publish(path_msg)
 
 
     while not rospy.is_shutdown():
@@ -68,16 +96,9 @@ def pynavbot_fly():
         u = np.matrix([xu[12:]]).T
 
         # publish updated drone locaation
-        quaternion = tf.transformations.quaternion_from_euler(xu[6], xu[7], xu[8])
-        pose_msg.pose.pose.position.x = xu[0]
-        pose_msg.pose.pose.position.y = xu[1]
-        pose_msg.pose.pose.position.z = xu[2]
-        pose_msg.pose.pose.orientation.x = quaternion[0]
-        pose_msg.pose.pose.orientation.y = quaternion[1]
-        pose_msg.pose.pose.orientation.z = quaternion[2]
-        pose_msg.pose.pose.orientation.w = quaternion[3]
-
-        pose_pub.publish(pose_msg)
+        pose = handle_pose(xu)
+        path_msg.poses.append(pose)
+        path_pub.publish(path_msg)
         rate.sleep()
 
 if __name__ == '__main__':
