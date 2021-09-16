@@ -15,10 +15,21 @@
 #include "navbot_plan/navbot_plan.hpp"
 
 static visualization_msgs::MarkerArray obstacles;
+static std::vector<double> pose = {0,0,0};
 
 void obstacle_callback(const visualization_msgs::MarkerArray& msg)
 {
     obstacles = msg;
+}
+
+void pose_callback(const nav_msgs::Path msg){
+
+    int i = msg.poses.size() - 1;
+    pose = {};
+    pose.push_back(msg.poses[i].pose.position.x);
+    pose.push_back(msg.poses[i].pose.position.y);
+    pose.push_back(msg.poses[i].pose.position.z);
+
 }
 
 
@@ -33,6 +44,7 @@ int main(int argc, char **argv)
 
     // publishers and subscribers
     ros::Subscriber obstacles_sub = n.subscribe("known_obstacles", 10, obstacle_callback);
+    ros::Subscriber pose_sub = n.subscribe("navbot_path", 5, pose_callback);
     ros::Publisher path_pub = n.advertise<nav_msgs::Path>("path", 5);
     ros::Publisher goal_pub = n.advertise<geometry_msgs::PointStamped>("waypoint",5);
     
@@ -58,6 +70,14 @@ int main(int argc, char **argv)
     while (ros::ok())
     {
 
+        double dist = sqrt(pow(goal_msg.point.x - pose[0],2) + pow(goal_msg.point.y - pose[1],2) + pow(goal_msg.point.z - pose[2],2));
+
+        if (dist < 2.5 and index < points.size()-1){
+            index++;
+            goal_msg.point.x = points[index][0];
+            goal_msg.point.y = points[index][1];
+            goal_msg.point.z = points[index][2];
+        }
         path_pub.publish(path);
         goal_pub.publish(goal_msg);
 

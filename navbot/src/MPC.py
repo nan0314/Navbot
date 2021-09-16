@@ -19,8 +19,8 @@ class MPC:
         dx = goal[0:3] - x[0:3]
         dist = np.linalg.norm(dx)
 
-        if dist > 8:
-            dx *= 8/dist
+        if dist > 2.5:
+            dx *= 5/dist
         
         goal[0:3] = x[0:3] + dx
 
