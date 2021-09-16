@@ -1,9 +1,10 @@
 <launch>
 
     <node name="planner" pkg="navbot_plan" type="planner" output="screen"/>
+    <arg name="model" default="-d $(find navbot_plan)/config/model.rviz"/>
 
     <include file="$(find navbotsim)/launch/world.launch">
-        <arg name="model" value="-d $(find navbot_plan)/config/model.rviz"/>
+        <arg name="model" value="$(arg model)"/>
     </include>
 
 
