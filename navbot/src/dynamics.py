@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 import numpy as np
-import sympy as sym
-import cvxpy as cvx
-
 
 class navbot:
 
