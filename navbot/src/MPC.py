@@ -3,13 +3,28 @@ import cvxpy as cvx
 
 class MPC:
 
-    def __init__(self, N=20, dt=0.1, Q=5*np.eye(12),R=0.3*np.eye(4),umax=25):
+    def __init__(self, N=30, dt=0.05, Q=5*np.eye(12),R=0.3*np.eye(4),umax=25):
+
+        Q[6,6] = 0
+        Q[7,7] = 0
+        Q[8,8] = 0
 
         self.N = N
         self.dt = dt
         self.Q = Q
         self.R = R
         self.umax = umax
+
+    def trim_goal(self,x,goal):
+        dx = goal[0:3] - x[0:3]
+        dist = np.linalg.norm(dx)
+
+        if dist > 8:
+            dx *= 8/dist
+        
+        goal[0:3] = x[0:3] + dx
+
+        return goal
     
     def ricatti(self,A,B):
         P_inf = self.Q
@@ -42,6 +57,9 @@ class MPC:
     
     def control(self,x,u,A,B,c,goal):
 
+        # trim goal
+        goal = self.trim_goal(x,goal)
+
         # Dictionary to store X_k, U_k (predicted state/control)
         X = {}
         U = {}
@@ -63,7 +81,7 @@ class MPC:
 
             # Add cost terms
             cost.append( cvx.quad_form(X[k] - goal,self.Q) ) # state cost
-            # cost.append( cvx.quad_form(U[k],R) ) # control cost
+            cost.append( cvx.quad_form(U[k],self.R) ) # control cost
 
             # add constraints
             constraints += self.feasibility_constraints(X[k],U[k])
@@ -75,8 +93,7 @@ class MPC:
             
         # final state
         X[self.N-1] = cvx.Variable((n,1))
-        cost.append( cvx.quad_form(X[k] - goal,P) ) # state cost
-        # cost.append( cvx.quad_form(U[k],R) ) # control cost
+        cost.append( cvx.quad_form(X[k] - goal,10*P) ) # state cost
 
         constraints += self.feasibility_constraints(X[self.N-1],U[self.N-2])
         constraints.append(X[self.N-1] == x + A@(X[self.N-2]-x) + B@(U[self.N-2]-u) + c)

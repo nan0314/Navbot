@@ -125,9 +125,9 @@ include_directories(
 )
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}
-  src/${PROJECT_NAME}.cpp
-)
+# add_library(${PROJECT_NAME}
+#   src/${PROJECT_NAME}.cpp
+# )
 
 
 ## Add cmake target dependencies of the library
@@ -138,7 +138,7 @@ add_library(${PROJECT_NAME}
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(dynamics_test src/test.cpp)
+# add_executable(dynamics_test src/test.cpp)
 
 
 ## Rename C++ executable without prefix
@@ -149,15 +149,15 @@ add_executable(dynamics_test src/test.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(dynamics_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(dynamics_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(dynamics_test
-  ${catkin_LIBRARIES}
-  ${PROJECT_NAME}
-  ${Boost_LIBRARIES}
-  ${ARMADILLO_LIBRARIES}
-)
+# target_link_libraries(dynamics_test
+#   ${catkin_LIBRARIES}
+#   ${PROJECT_NAME}
+#   ${Boost_LIBRARIES}
+#   ${ARMADILLO_LIBRARIES}
+# )
 
 
 #############
@@ -182,11 +182,11 @@ target_link_libraries(dynamics_test
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-install(TARGETS ${PROJECT_NAME}
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-)
+# install(TARGETS ${PROJECT_NAME}
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+# )
 
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/

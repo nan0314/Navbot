@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /TF1/Frames1
         - /Path2
+        - /PointStamped1
       Splitter Ratio: 0.5
     Tree Height: 848
   - Class: rviz/Selection
@@ -138,6 +139,17 @@ Visualization Manager:
       Topic: /navbot_path
       Unreliable: false
       Value: true
+    - Alpha: 1
+      Class: rviz/PointStamped
+      Color: 204; 41; 204
+      Enabled: true
+      History Length: 1
+      Name: PointStamped
+      Queue Size: 10
+      Radius: 0.20000000298023224
+      Topic: /waypoint
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -166,7 +178,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 58.12229919433594
+      Distance: 87.82684326171875
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -174,17 +186,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -3.4353630542755127
-        Y: 15.041924476623535
-        Z: -6.641051769256592
+        X: 0.24297600984573364
+        Y: 7.1583757400512695
+        Z: -1.1087067127227783
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4953986406326294
+      Pitch: 0.5853986144065857
       Target Frame: <Fixed Frame>
-      Yaw: 0.5153756737709045
+      Yaw: 0.3453487455844879
     Saved: ~
 Window Geometry:
   Displays:

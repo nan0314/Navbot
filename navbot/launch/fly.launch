@@ -1,5 +1,7 @@
 <launch>
 
+    
+
     <node name="controller" pkg="navbot" type="pynavbot_fly.py" output="screen"/>
 
     <include file="$(find navbot_plan)/launch/plan.launch">

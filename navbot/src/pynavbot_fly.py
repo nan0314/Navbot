@@ -8,6 +8,7 @@ from std_msgs.msg import String
 from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PointStamped
 import numpy as np
 import cvxpy as cvx
 import scipy
@@ -48,12 +49,18 @@ def handle_pose(x):
 
     return pose
 
+def goal_callback(msg):
+    global goal
+    goal = np.matrix([[msg.point.x,msg.point.y,msg.point.z,0,0,0,0,0,0,0,0,0]]).T
 
 
 def pynavbot_fly():
-    path_pub = rospy.Publisher('navbot_path', Path, queue_size=10)
+    global goal
     rospy.init_node('pynavbot_fly', anonymous=True)
     rate = rospy.Rate(10) # 10hz
+
+    path_pub = rospy.Publisher('navbot_path', Path, queue_size=10)
+    rospy.Subscriber("waypoint", PointStamped, goal_callback)
 
     path_msg = Path()
     path_msg.header.frame_id = "world"
@@ -64,7 +71,7 @@ def pynavbot_fly():
     u = np.matrix([xu[12:]]).T
 
     dt = 0.1
-    goal = np.matrix([[25,30,5,0,0,0,0,0,0,0,0,0]]).T
+    goal = x#np.matrix([[26,21,11,0,0,0,0,0,0,0,0,0]]).T # set goal to initial state for hover until initial path recieved
 
     # set up linear model
     model = navbot()
