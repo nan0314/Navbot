@@ -55,7 +55,7 @@ int main(int argc, char **argv)
     }
 
     // Find initial path
-    vector<vector<double>> points = theta_star({30,30,5},{-30,-30,5},obstacles,10);
+    vector<vector<double>> points = theta_star({30,30,5},{-30,-30,5},obstacles,3);
 
     // select initial goal
     int index = 1;

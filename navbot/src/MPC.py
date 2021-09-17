@@ -55,7 +55,7 @@ class MPC:
         return constraints
 
     
-    def control(self,x,u,A,B,c,goal):
+    def control(self,x,u,A,B,c,goal,prev):
 
         # trim goal
         goal = self.trim_goal(x,goal)
@@ -80,6 +80,7 @@ class MPC:
             U[k] = cvx.Variable((m,1))
 
             # Add cost terms
+            # cost.append( 20*cvx.norm(((prev - goal).T@(prev - goal) / (cvx.norm(prev - goal)**2 + 1e-4) - np.eye(12))@(X[k] - goal)))
             cost.append( cvx.quad_form(X[k] - goal,self.Q) ) # state cost
             cost.append( cvx.quad_form(U[k],self.R) ) # control cost
 

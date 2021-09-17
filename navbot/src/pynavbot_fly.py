@@ -51,11 +51,17 @@ def handle_pose(x):
 
 def goal_callback(msg):
     global goal
-    goal = np.matrix([[msg.point.x,msg.point.y,msg.point.z,0,0,0,0,0,0,0,0,0]]).T
+    global prev
+
+    next = np.matrix([[msg.point.x,msg.point.y,msg.point.z,0,0,0,0,0,0,0,0,0]]).T
+    if (np.linalg.norm(next - goal) > 0.1):
+        prev = goal
+        goal = next
 
 
 def pynavbot_fly():
     global goal
+    global prev
     rospy.init_node('pynavbot_fly', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
@@ -71,6 +77,7 @@ def pynavbot_fly():
     u = np.matrix([xu[12:]]).T
 
     dt = 0.1
+    prev = x
     goal = x#np.matrix([[26,21,11,0,0,0,0,0,0,0,0,0]]).T # set goal to initial state for hover until initial path recieved
 
     # set up linear model
@@ -92,7 +99,7 @@ def pynavbot_fly():
         c = model.c(x,u,dt)
         
         # get control for current operating point
-        u = controller.control(x,u,A,B,c,goal)
+        u = controller.control(x,u,A,B,c,goal,prev)
 
         # simulate nonlinear dynamics (take time step)
         xu[12:] = [u[0],u[1],u[2],u[3]]

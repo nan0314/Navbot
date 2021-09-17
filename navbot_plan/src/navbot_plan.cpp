@@ -109,13 +109,13 @@ namespace navbot_plan{
 
     bool is_valid(const visualization_msgs::Marker &obstacle, const vector<double> &point){
 
-        // Calculate bounds for each dimension with 10% buffer
-        double x_lower = obstacle.pose.position.x - 1.1*obstacle.scale.x/2;
-        double x_upper = obstacle.pose.position.x + 1.1*obstacle.scale.x/2;
-        double y_lower = obstacle.pose.position.y - 1.1*obstacle.scale.y/2;
-        double y_upper = obstacle.pose.position.y + 1.1*obstacle.scale.y/2;
-        double z_lower = obstacle.pose.position.z - 1.1*obstacle.scale.z/2;
-        double z_upper = obstacle.pose.position.z + 1.1*obstacle.scale.z/2;
+        // Calculate bounds for each dimension with 15% buffer
+        double x_lower = obstacle.pose.position.x - 1.15*obstacle.scale.x/2;
+        double x_upper = obstacle.pose.position.x + 1.15*obstacle.scale.x/2;
+        double y_lower = obstacle.pose.position.y - 1.15*obstacle.scale.y/2;
+        double y_upper = obstacle.pose.position.y + 1.15*obstacle.scale.y/2;
+        double z_lower = obstacle.pose.position.z - 1.15*obstacle.scale.z/2;
+        double z_upper = obstacle.pose.position.z + 1.15*obstacle.scale.z/2;
 
         bool in_x = point[0] > x_lower and point[0] < x_upper;
         bool in_y = point[1] > y_lower and point[1] < y_upper;
