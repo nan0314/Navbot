@@ -11,11 +11,54 @@
 ///     service_name (service_type): description of the service
 
 #include "ros/ros.h"
-#include "std_msgs/String.h"
+#include "nav_msgs/Path.h"
+#include "geometry_msgs/Pose.h"
 #include "navbotsim/obstacles.hpp"
+#include "navbot_plan/replan.h"
 
 #include <iostream>
 #include <vector>
+
+visualization_msgs::MarkerArray unknown_msg;
+visualization_msgs::MarkerArray known_msg;
+static ros::ServiceClient client;
+
+void pose_callback(nav_msgs::Path msg){
+
+    geometry_msgs::Pose pose = msg.poses[msg.poses.size()-1].pose;
+    int count = 0;
+    for (auto &obstacle : unknown_msg.markers){
+
+        if (obstacle.action != 0){
+            continue;
+        }
+        double magnitude = sqrt(pow(obstacle.scale.x,2) + pow(obstacle.scale.y,2));
+        double dx = obstacle.pose.position.x - pose.position.x;
+        double dy = obstacle.pose.position.y - pose.position.y;
+        double dist = sqrt(pow(dx,2) + pow(dy,2));
+
+        if (dist < 7 + magnitude){
+            count++;
+            visualization_msgs::Marker copy;
+            copy.header = obstacle.header;
+            copy.id = obstacle.id;
+            copy.type = obstacle.type;
+            copy.action = 0;
+            copy.pose = obstacle.pose;
+            copy.scale = obstacle.scale;
+            copy.color.b = 1;
+            copy.color.g = 1;
+            copy.color.a = 0.75;
+            obstacle.action = 2;
+            known_msg.markers.push_back(copy);
+
+            navbot_plan::replan srv;
+            client.call(srv);
+        }
+
+    }
+
+}
 
 int main(int argc, char **argv)
 {
@@ -25,15 +68,14 @@ int main(int argc, char **argv)
 
     ros::NodeHandle n;
 
+    ros::Subscriber pose_sub = n.subscribe("navbot_path", 5, pose_callback);
     ros::Publisher known_pub = n.advertise<visualization_msgs::MarkerArray>("known_obstacles", 5);
     ros::Publisher unknown_pub = n.advertise<visualization_msgs::MarkerArray>("unknown_obstacles", 5);
+    client = n.serviceClient<navbot_plan::replan>("replan");
 
     // create obstacles   
-    visualization_msgs::MarkerArray known_msg = obstacles::known_obstacles("world");
-    visualization_msgs::MarkerArray unknown_msg = obstacles::unknown_obstacles("world",10);
-
-    // Run A*
-    
+    known_msg = obstacles::known_obstacles("world");
+    unknown_msg = obstacles::unknown_obstacles("world",10);   
 
     ros::Rate loop_rate(10);
 

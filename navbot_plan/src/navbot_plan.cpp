@@ -39,7 +39,7 @@ namespace navbot_plan{
         for (auto x : X){
             for (auto y : Y){
                 for (auto z : Z){
-                    if ((x == pos[0] and y == pos[1] and z == pos[2]) or z < 0 or !valid_successor(obstacles,{x,y,z},step/5)){
+                    if ((x == pos[0] and y == pos[1] and z == pos[2]) or z < 5 or !valid_successor(obstacles,{x,y,z},step/5)){
                         continue;
                     } else{
                         successors.push_back({x,y,z});

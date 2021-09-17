@@ -8,6 +8,7 @@ project(navbotsim)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  navbot_plan
   roscpp
   rospy
   std_msgs
@@ -107,7 +108,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES navbotsim
- CATKIN_DEPENDS roscpp rospy std_msgs visualization_msgs
+ CATKIN_DEPENDS navbot_plan roscpp rospy std_msgs visualization_msgs
 #  DEPENDS system_lib
 )
 
