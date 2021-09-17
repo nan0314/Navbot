@@ -19,6 +19,7 @@
 #include <stack>
 
 static visualization_msgs::MarkerArray obstacles;
+static visualization_msgs::MarkerArray unknown;
 static geometry_msgs::PointStamped goal_msg;
 static std::vector<double> pose = {0,0,0};
 static std::vector<double> goal;
@@ -31,17 +32,21 @@ bool replan_service(navbot_plan::replan::Request  &req,
     using std::vector;
 
     std::cout << "here" << std::endl;
-    visualization_msgs::Marker obstacle = obstacles.markers[obstacles.markers.size()-1];
+    int index = req.index;
+    visualization_msgs::Marker obstacle = unknown.markers[index];
     visualization_msgs::MarkerArray check;
     check.markers.push_back(obstacle);
     navbot_plan::Node robot = navbot_plan::Node(pose,nullptr);
     navbot_plan::Node goal_node = navbot_plan::Node(goal,nullptr);
     vector<vector<double>> new_path;
-    if (!robot.valid_successor(check,goal,0.5)) {
-        new_path = navbot_plan::theta_star(pose,goal,obstacles,5);        
-    } else if (!goal_node.valid_successor(check,waypoints.top(),0.5)){
-        new_path = navbot_plan::theta_star(pose,waypoints.top(),obstacles,5);        
+    if (!robot.valid_successor(check,goal,1)) {
+        std::cout << "yuh" << std::endl;
+        new_path = navbot_plan::a_star(pose,goal,obstacles,5);        
+    } else if (!goal_node.valid_successor(check,waypoints.top(),1)){
+        std::cout << "yuh" << std::endl;
+        new_path = navbot_plan::a_star(pose,waypoints.top(),obstacles,5);        
     } else {
+        std::cout << "what?" << std::endl;
         return true;
     }
 
@@ -50,7 +55,7 @@ bool replan_service(navbot_plan::replan::Request  &req,
         }
 
     // select initial goal
-    std::cout << "yuh" << std::endl;
+    
     goal = waypoints.top();
     waypoints.pop();
     goal_msg.header.frame_id = "world";
@@ -64,6 +69,11 @@ bool replan_service(navbot_plan::replan::Request  &req,
 void obstacle_callback(const visualization_msgs::MarkerArray& msg)
 {
     obstacles = msg;
+}
+
+void unknown_callback(const visualization_msgs::MarkerArray& msg)
+{
+    unknown = msg;
 }
 
 void pose_callback(const nav_msgs::Path msg){
@@ -89,6 +99,7 @@ int main(int argc, char **argv)
 
     // publishers and subscribers
     ros::Subscriber obstacles_sub = n.subscribe("known_obstacles", 10, obstacle_callback);
+    ros::Subscriber unkown_sub = n.subscribe("unknown_obstacles", 10, unknown_callback);
     ros::Subscriber pose_sub = n.subscribe("navbot_path", 5, pose_callback);
     ros::Publisher path_pub = n.advertise<nav_msgs::Path>("path", 5);
     ros::Publisher goal_pub = n.advertise<geometry_msgs::PointStamped>("waypoint",5);
@@ -101,7 +112,7 @@ int main(int argc, char **argv)
     }
 
     // Find initial path
-    vector<vector<double>> points = theta_star({30,30,5},{-30,-30,5},obstacles,10);
+    vector<vector<double>> points = theta_star({30,30,5},{-30,-30,5},obstacles,5);
 
     // Create waypoint stack
     for (int i = points.size()-1; i>0; i--){
