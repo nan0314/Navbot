@@ -1,7 +1,7 @@
 # Navbot
 Nonlinear model simulation and linear MPC of 12D quadrotor navbot
-* `<roslaunch navbot fly.launch>` to run the simulation + control
-* `<roslaunch navbot fly.launch enable_replan:=true>` to run the simulation + control with replanning
+* `roslaunch navbot fly.launch` to run the simulation + control
+* `roslaunch navbot fly.launch enable_replan:=true` to run the simulation + control with replanning
 
 ## Needs Work/Opportunities for Future Development
 The simulation is not very realistic. It currently works by assuming the state is known, calculating the control signal (assuming it can be completed within 0.1 seconds), and then once the control has been successfully computed, the state is simulated forward by 0.1 seconds.

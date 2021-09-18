@@ -33,7 +33,7 @@ These directions assume you have completed installation and setup of ROS Noetic 
 
 Simulate the autnomous path planning and control by running the folowing command:
 
-`<roslaunch navbot fly.launch>`
+`roslaunch navbot fly.launch`
 
 ## TODO
 
