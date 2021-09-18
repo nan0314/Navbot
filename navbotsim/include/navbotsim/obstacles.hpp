@@ -37,15 +37,22 @@ namespace obstacles{
 
     /// \brief creates a marker array containing known obstacles for the initial state
     ///        of the navigation problem
+    /// \param frame - name of frame obstacles exist in
     /// \return marker array containing initial known obstacles
     visualization_msgs::MarkerArray known_obstacles(string frame);
 
     /// \brief creates a marker array containing unknown obstacles for the inital state
     ///        of the navigation problem
-    /// \param
+    /// \param frame - name of frame obstacles exist in
     /// \return marker array containing initial unknown obstacles
     visualization_msgs::MarkerArray unknown_obstacles(string frame, int random);
 
+    /// \brief checks if navbot is within range to detect currently unknown obstacles
+    /// \param known - known obstacles in environment
+    /// \param unknown - unknown obstacles in environment
+    /// \param navbot_pose - pose of navbot
+    /// \return -1 if not in range of any obstacles, otherwise return index of unknown.markers
+    ///         corresponding to the detected obstacle
     int check_obstacles(visualization_msgs::MarkerArray &known, visualization_msgs::MarkerArray &unknown, geometry_msgs::Pose navbot_pose);
 }
 

@@ -17,6 +17,7 @@ This repository consists of several ROS packages
 * Python 3
 * CVXPY
 * Numpy
+* Scipy
 
 ### Installing
 
@@ -24,6 +25,7 @@ These directions assume you have completed installation and setup of ROS Noetic 
 
 * Install cvxpy using the command `pip install cvxpy`
 * install numpy using the command `pip install numpy`
+* install scipy using the command `pip install scipy`
 * Clone this repository into the src directory of your workspace
 * Build and source your workspace
 

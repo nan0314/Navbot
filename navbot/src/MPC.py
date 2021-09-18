@@ -1,6 +1,9 @@
 import numpy as np
 import cvxpy as cvx
 
+# file
+# brief - library for MPC of linear quadrotor model
+
 class MPC:
 
     def __init__(self, N=30, dt=0.05, Q=5*np.eye(12),R=0.3*np.eye(4),umax=25):
@@ -15,6 +18,7 @@ class MPC:
         self.R = R
         self.umax = umax
 
+    # projects goal to distance 5 away from navbot location unless close to goal
     def trim_goal(self,x,goal):
         dx = goal[0:3] - x[0:3]
         dist = np.linalg.norm(dx)
@@ -26,6 +30,8 @@ class MPC:
 
         return goal
     
+    # iteratively solves ricatti equation to find optimal cost matrix for 
+    # infinite time horizon -- applied to final time step
     def ricatti(self,A,B):
         P_inf = self.Q
 
@@ -42,6 +48,7 @@ class MPC:
         
         return P
 
+    # Adds feasibilty constraints
     def feasibility_constraints(self,X_k,U_k):
         constraints = []
         constraints.append(cvx.norm(U_k,"inf") <= self.umax)
@@ -55,6 +62,7 @@ class MPC:
         return constraints
 
     
+    # uses MPC to calculate optimal control for current time step
     def control(self,x,u,A,B,c,goal,prev):
 
         # trim goal

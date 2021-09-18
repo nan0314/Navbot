@@ -6,14 +6,15 @@ namespace obstacles{
     using visualization_msgs::MarkerArray;
     using visualization_msgs::Marker;
 
-    visualization_msgs::Marker create(double x, double y, double z, double w, double l, double h, bool known, string frame, int id){
+    Marker create(double x, double y, double z, double w, double l, double h, bool known, string frame, int id){
 
-        visualization_msgs::Marker obstacle;
+        // create obstacle object - assign relevant parameters
+        Marker obstacle;
 
         obstacle.header.frame_id = frame;
         obstacle.id = id;
-        obstacle.type = 1;
-        obstacle.action = 0;
+        obstacle.type = 1;                      // specifies rectangular prism
+        obstacle.action = 0;                    // add marker/obstacle
         obstacle.pose.position.x = x;
         obstacle.pose.position.y = y;
         obstacle.pose.position.z = z + h/2;
@@ -25,6 +26,7 @@ namespace obstacles{
         obstacle.scale.y = l;
         obstacle.scale.z = h;
 
+        // assign color based on known/unknown status
         if (known){
             obstacle.color.b = 1;
             obstacle.color.g = 1;

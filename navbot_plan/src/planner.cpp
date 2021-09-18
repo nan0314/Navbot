@@ -1,14 +1,23 @@
 /// \file
-/// \brief This node simulates the environment that the navbot lives in.
+/// \brief This node handles planning and replanning of robot path. Also handles 
+///        transition between path waypoints as path is executed.
 ///
 /// PARAMETERS:
-///     parameter_name (parameter_type): description of the parameter
+///     world_frame (string): name of the world frame
 /// PUBLISHES:
-///     topic_name (topic_type): description of topic
+///     path_pub (nav_msgs::Path): publishes original path found at initial state/time
+///     replan_pub (nav_msgs::Path): publishes most recent replan path adjustment
+///     goal_pub (geometry_msgs::PointStamped): publishes the location of the current waypoint goal in path
+///                                             for navbot to track
 /// SUBSCRIBES:
-///     topic_name (topic_type): description of the topic
+///     obstacles_sub (visualization_msgs::MarkerArray): known obstacles
+///     unknown_sub (visualization_msgs::MarkerArray): unknown obstacles-- used when unknown obstacles becomes detected
+///                                                    for replanning purposes
+///     pose_sub (navbot_path): provides navbot pose data
 /// SERVICES:
-///     service_name (service_type): description of the service
+///     replan (navbot_plan::replan): triggers replanning of path in the event of newly detected obstacle
+/// TRANSFORMS:
+///     N/A
 
 #include "ros/ros.h"
 #include "geometry_msgs/PointStamped.h"
@@ -18,13 +27,17 @@
 
 #include <stack>
 
-static int unknown_index;
-static bool obstacle_detected = false;
-static visualization_msgs::MarkerArray obstacles;
-static visualization_msgs::MarkerArray unknown;
-static std::vector<double> pose = {0,0,0};
+static int unknown_index;                               // index of newly detected obstacle
+static bool obstacle_detected = false;                  // true if obstacle has been newly detected
+static visualization_msgs::MarkerArray obstacles;       // known obstacles
+static visualization_msgs::MarkerArray unknown;         // unkown obstacles
+static std::vector<double> pose = {0,0,0};              // navbot pose
 
 
+/// \brief saves index of newly detected obstacle and triggers replan
+/// \param req - navbot_plan::Request data
+/// \param res - navbot_plan::Response data
+/// \return true
 bool replan_service(navbot_plan::replan::Request  &req,
          navbot_plan::replan::Response &res)
 {
@@ -35,19 +48,25 @@ bool replan_service(navbot_plan::replan::Request  &req,
     return true;
 }
 
+/// \brief saves known obstacles
+/// \param msg - known obstacles
 void obstacle_callback(const visualization_msgs::MarkerArray& msg)
 {
     obstacles = msg;
 }
 
+/// \brief saves unknown obstacles
+/// \param msg unknown obstacles
 void unknown_callback(const visualization_msgs::MarkerArray& msg)
 {
     unknown = msg;
 }
 
+/// \brief saves most recent navbot pose from navbot path
+/// \param msg navbot path
 void pose_callback(const nav_msgs::Path msg){
 
-    int i = msg.poses.size() - 1;
+    int i = msg.poses.size() - 1;   // index of last navbot pose from navbot path
     pose = {};
     pose.push_back(msg.poses[i].pose.position.x);
     pose.push_back(msg.poses[i].pose.position.y);
@@ -63,6 +82,7 @@ int main(int argc, char **argv)
     using std::string;
     using namespace navbot_plan;
 
+    // initialize node
     ros::init(argc, argv, "planner");
     ros::NodeHandle n;
     ros::Rate loop_rate(10);
@@ -78,7 +98,6 @@ int main(int argc, char **argv)
 
     // ros params
     string world_frame;
-
     ros::param::get("world_frame",world_frame);
 
     // wait for environment to be created
@@ -128,7 +147,7 @@ int main(int argc, char **argv)
             obstacle_detected = false;
         }
 
-        // Normal procedure-- update goal if within distance and publish goal
+        // Normal procedure-- update goal if within distance and publish messages
         double dist = sqrt(pow(goal_msg.point.x - pose[0],2) + pow(goal_msg.point.y - pose[1],2) + pow(goal_msg.point.z - pose[2],2));
 
         if (dist < 2.5 and !waypoints.empty()){
@@ -139,9 +158,9 @@ int main(int argc, char **argv)
             goal_msg.point.z = goal[2];
         }
 
-        path_pub.publish(path);
-        goal_pub.publish(goal_msg);
-        replan_pub.publish(replan_msg);
+        path_pub.publish(path);             // publish path
+        goal_pub.publish(goal_msg);         // publish current waypoint goal
+        replan_pub.publish(replan_msg);     // publish replan path
 
         ros::spinOnce();
         loop_rate.sleep();

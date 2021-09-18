@@ -21,9 +21,11 @@ namespace navbot_plan{
 
     vector<vector<double>> Node::getPath(){
 
+        // initialize path vector with node position
         vector<vector<double>> path = {pos};
         Node current = *this;
 
+        // iterate back through linked parent nodes and append their position to path vector
         while (current.parent != nullptr){
             current = *current.parent;
             path.push_back(current.pos);
@@ -36,13 +38,17 @@ namespace navbot_plan{
 
         vector<vector<double>> successors;
 
+        // possible x, y, z locations of successors
         vector<double> X = {pos[0] - step, pos[0], pos[0] + step};
         vector<double> Y = {pos[1] - step, pos[1], pos[1] + step};
         vector<double> Z = {pos[2] - step, pos[2], pos[2] + step};
 
+        // check each x, y, z combination to see if combination results in a valid successor
         for (auto x : X){
             for (auto y : Y){
                 for (auto z : Z){
+                    // valid successors have z > 5, are not the current node, and do not create a path that comes too close to
+                    // an obstacle
                     if ((x == pos[0] and y == pos[1] and z == pos[2]) or z < 5 or !valid_successor(obstacles,{x,y,z},step/5)){
                         continue;
                     } else{
@@ -121,6 +127,7 @@ namespace navbot_plan{
         double z_lower = obstacle.pose.position.z - 1.15*obstacle.scale.z/2;
         double z_upper = obstacle.pose.position.z + 1.15*obstacle.scale.z/2;
 
+        // check if point is inside of bounds
         bool in_x = point[0] > x_lower and point[0] < x_upper;
         bool in_y = point[1] > y_lower and point[1] < y_upper;
         bool in_z = point[2] > z_lower and point[2] < z_upper;
@@ -147,6 +154,7 @@ namespace navbot_plan{
             out.push_back({a[0] + i*dx, a[1] + i*dy, a[2] + i*dz});
         }
 
+        // add endpoint
         out.push_back(b);
 
         return out;
@@ -511,6 +519,7 @@ namespace navbot_plan{
 
     nav_msgs::Path nav_path(const vector<vector<double>> &path, const std::string &frame){
 
+        // initialize path and pose
         geometry_msgs::PoseStamped pose;
         nav_msgs::Path poses;
         
@@ -521,6 +530,7 @@ namespace navbot_plan{
         pose.pose.orientation.z = 0;
         pose.pose.orientation.w = 1;
 
+        // convert each waypoint in path to pose and add it to path
         for (auto point : path){
             pose.pose.position.x = point[0];
             pose.pose.position.y = point[1];

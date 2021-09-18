@@ -1,5 +1,9 @@
 /// \file
-/// \brief Library for handling navbot dynamics
+/// \brief Library for handling navbot dynamics 
+
+///////////////
+// DEPRECATED
+///////////////
 
 #ifndef NAVBOT_INCLUDE_GUARD_HPP
 #define NAVBOT_INCLUDE_GUARD_HPP

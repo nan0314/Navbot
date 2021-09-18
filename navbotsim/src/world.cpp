@@ -2,13 +2,17 @@
 /// \brief This node simulates the environment that the navbot lives in.
 ///
 /// PARAMETERS:
-///     parameter_name (parameter_type): description of the parameter
+///     enable_replan (bool): true if unknown obtacles and replanning is desired
+///     world_frame (string): name of world frame
 /// PUBLISHES:
-///     topic_name (topic_type): description of topic
+///     known_obstacles (visualization_msgs::MarkerArray): known obstacles in environment
+///     unknown_obstacles (visualization_msgs::MarkerArray): unknown obstacles in environment
 /// SUBSCRIBES:
-///     topic_name (topic_type): description of the topic
+///     navbot_path (nav_msgs::Path): path of navbot poses
 /// SERVICES:
-///     service_name (service_type): description of the service
+///     N/A
+/// TRANSFORMS:
+///     N/A
 
 #include "ros/ros.h"
 #include "nav_msgs/Path.h"

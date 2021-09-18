@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+
+# file
+# brief - Tests the linear model against the nonlinear model to ensure the linear model
+#         matches the nonlinear model for given dt
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.lib.function_base import diff
@@ -6,15 +10,15 @@ import scipy
 from scipy.integrate import odeint
 from dynamics import navbot
 
+# navbot object
 navbot = navbot()
 
-# print(navbot.f([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],0))
-
+# intial conditions
 dt = 0.01
 xu0 = [25,30,5,0,0,0,0,0,0,0,0,0,0,0,0,0]
-t_vec = list(np.arange(0,0.25,dt))
-# print(navbot.f(xu0,0).T.tolist()[0])
 
+# Solve nonlinear model
+t_vec = list(np.arange(0,0.25,dt))
 ans = odeint(navbot.f,xu0,t_vec)
 z_vec1 = [val[2] for val in ans]
 ans[-1][12:] = [-10/4,-10/4,-10/4,-10/4]
@@ -23,7 +27,7 @@ ans2 = odeint(navbot.f,ans[-1],t_vec)
 z_vec2 = [val[2] for val in ans2]
 z_vec = z_vec1 + z_vec2[1:]
 
-
+# solve linear model
 t_vec = list(np.arange(0,0.5-dt,dt))
 X = np.matrix([xu0[0:12]]).T
 U = np.matrix([xu0[12:]]).T
@@ -32,8 +36,6 @@ U0=U
 A = navbot.A(X,dt)
 B = navbot.B(dt)
 c = navbot.c(X,U,dt)
-# print(navbot.dfdx(X))
-# 5/0
 
 discrete = [X.T.tolist()[0]]
 for k in range(len(z_vec)-1):
@@ -51,9 +53,9 @@ for k in range(len(z_vec)-1):
     xnew = X0 + A@(X - X0) + B@(U - U0) + c
     X = np.matrix(xnew)
     discrete.append(X.T.tolist()[0])
-
-
 z_vecd = [val[2] for val in discrete]
+
+# plot results
 plt.plot(t_vec,z_vec)
 plt.plot(t_vec,z_vecd)
 plt.show()

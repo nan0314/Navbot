@@ -35,6 +35,7 @@ namespace navbot_plan{
 
         /// \brief Constructor - copies the values of a Node object into
         ///        a new Node object
+        /// \param node - node object to copy
         Node(Node* node);
 
         /// \brief Constructor - creates a Node object with initializing 
@@ -75,7 +76,7 @@ namespace navbot_plan{
         /// \param obstacles - invalid locations for nodes
         /// \param point - point to check valid or not valid
         /// \param dp - length between checked endpoints
-        /// \returns true if no endpoints (including point) are within an obstacle
+        /// \returns true if no endpoints (including point) are within or near an obstacle
         bool valid_successor(const visualization_msgs::MarkerArray &obstacles, const vector<double> &point, const double &dp);
 
         /// \brief Outputs the position of a node as a string
@@ -106,9 +107,6 @@ namespace navbot_plan{
     /// \param b - end of line for interpolation
     /// \return vector of points between a and b-- include b
     vector<vector<double>> interpolate(const vector<double> &a, const vector<double> &b, const int &N);
-
-
-    bool cmp(Node* a, Node* b);
     
     /// \brief finds the optimal path between start and end, avoiding obstacles.
     /// \param start - starting point of path
@@ -138,12 +136,22 @@ namespace navbot_plan{
     vector<vector<double>> lazy_theta_star(const vector<double> &start, const vector<double> &end, 
     const visualization_msgs::MarkerArray &obstacles, const double &step);
 
+    /// \brief checks to see if new obstacle requires an adjustment to the current path and replans path
+    ///         if necessary
+    /// \param obstacles - all known obstacles in environment
+    /// \param obstacle - newly detected obstacle in environment
+    /// \param replan_path - path object to store new replanned path in
+    /// \param robot_pose - navbot pose at time of new object detection
+    /// \param goal - current tracking goal waypoint at time of new object detection
+    /// \param waypoints - waypoints queue of remaining waypoints in path-- does not include current goal
+    /// \param frame - frame of path
     void replan_path(const MarkerArray obstacles, const Marker &obstacle, nav_msgs::Path &replan_path,
     const vector<double> &robot_pose, const vector<double> &goal, stack<vector<double>> &waypoints, const std::string &frame);
 
-    /// \brief converts a path represented by a vector<vector<double>
+    /// \brief converts a path represented by a vector of double vectors.
     ///        into a nav_msgs::Path
     /// \param path - vector containing path of points {x,y,z}
+    /// \param frame - frame of path
     /// \return same path represented as poses in a nav_msgs::Path
     nav_msgs::Path nav_path(const vector<vector<double>> &path, const std::string &frame);
 

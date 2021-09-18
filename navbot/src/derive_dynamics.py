@@ -1,20 +1,27 @@
 #!/usr/bin/env python3
+
+### file
+### brief - handles symbolic math deriving quadrotor dynamics
+
 import numpy as np
 import sympy as sym
 
+# derivative function
 def derivative(f,x):
     return sym.Matrix([f]).jacobian(x)
 
+# symbols and symbol substition dictionary
 phi, p, theta, q, psi, r = sym.symbols('phi p theta q psi r')
 x, Vx, y, Vy, z, Vz = sym.symbols('x Vx y Vy z Vz')
 u1, u2, u3, u4 = sym.symbols('u1 u2 u3 u4')
 Jx, Jy, Jz, m, g, L, c = sym.symbols('Jx, Jy, Jz, m, g, L, c')
 subber = {x:1, y:2, z:3, Vx:4, Vy:5, Vz:6, phi:7, theta:8, psi:9, p:10, q:11, r:12, Jx:1, Jy:1, Jz:1, g:-10,c:1,L:1,u1:13,u2:14,u3:15,u4:16}
 
-
+# state and controls matrix
 X = [x,y,z,Vx,Vy,Vz,phi,theta,psi,p,q,r]
 U = [u1,u2,u3,u4]
 
+# body inertia matrix
 J = [[Jx, 0, 0],
      [0, Jy, 0],
      [0, 0, Jz]]
@@ -23,27 +30,33 @@ J = sym.Matrix(J)
 e3 = [[0],[0],[1]]
 e3 = sym.Matrix(e3)
 
+# 
 R = [ [sym.cos(theta)*sym.cos(psi), sym.cos(theta)*sym.sin(psi), -sym.sin(theta)],
       [sym.sin(theta)*sym.cos(psi)*sym.sin(phi) - sym.sin(psi)*sym.cos(phi), sym.sin(theta)*sym.sin(psi)*sym.sin(phi) + sym.cos(psi)*sym.cos(phi), sym.cos(theta)*sym.sin(phi)],
       [sym.sin(theta)*sym.cos(psi)*sym.cos(phi) + sym.sin(psi)*sym.sin(phi), sym.sin(theta)*sym.sin(psi)*sym.cos(phi) - sym.cos(psi)*sym.sin(phi), sym.cos(theta)*sym.cos(phi)]]
 R = sym.Matrix(R).subs(subber)
 
+# 
 W = [ [1, sym.sin(phi)*sym.tan(theta), sym.cos(phi)*sym.tan(theta)],
       [0, sym.cos(phi), -sym.sin(phi)],
       [0, sym.sin(phi)/sym.cos(theta), sym.cos(phi)/sym.cos(theta)]]
 W = sym.Matrix(W)
 
+# body velocity matrix
 V_B = sym.Matrix([[Vx], [Vy], [Vz]]).subs(subber)
 
+# body angular velocity matrix
 Omega = sym.Matrix([[p], [q], [r]]).subs(subber)
 
-p_dot = R.T@V_B
-V_Bdot = np.cross(-Omega,V_B,axis=0) + g*R@e3
-Theta_dot = W@Omega
-Omega_dot = J.inv()@(np.cross(-Omega,J@Omega,axis=0))
-filler = np.zeros((4,1))
+# Xdot
+p_dot = R.T@V_B                                             # velocities
+V_Bdot = np.cross(-Omega,V_B,axis=0) + g*R@e3               # accelerations
+Theta_dot = W@Omega                                         # angular velocities
+Omega_dot = J.inv()@(np.cross(-Omega,J@Omega,axis=0))       # angular accelerations
+filler = np.zeros((4,1))                                    # should be removed
 
-Bc = [[0,0,0,0],
+
+Bc = [[0,0,0,0],                                            # external forces matrix e.g gravity and control
       [0,0,0,0],
       [0,0,0,0],
       [0,0,0,0],
@@ -64,11 +77,11 @@ xdot = np.vstack((p_dot, V_Bdot, Theta_dot, Omega_dot,filler)) + np.vstack((BcF,
 
 # print("f: \n", xdot)
 
-###########
-# Uncommented Code is for checking values of dfdx (it's big and important)
-###########
+#########################################################################
+# Commented Code is for checking values of dfdx (it's big and important)
+#########################################################################
 
-
+# dfdx, dfdu for model linearization
 # dfdx = (derivative(xdot,X).subs(subber))
 dfdx = np.matrix(derivative(xdot,X))
 dfdu = np.matrix(derivative(xdot,U))

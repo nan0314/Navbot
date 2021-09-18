@@ -95,7 +95,7 @@ def pynavbot_fly():
 
     dt = 0.1
     prev = x
-    goal = x#np.matrix([[26,21,11,0,0,0,0,0,0,0,0,0]]).T # set goal to initial state for hover until initial path recieved
+    goal = x    # set goal to initial state for hover until initial path recieved
 
     # set up linear model
     model = navbot()
