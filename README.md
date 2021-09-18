@@ -71,9 +71,11 @@ Nathaniel Nyberg
 Inspiration, code snippets, etc.
 
 * I was inspired to do this project and applied concepts from the Optimal and Learning Based Control course, [AA 203](http://asl.stanford.edu/aa203/).
-* I followed the mathematical model of a Quadrotor from 1.
+* Path finding algorithms adopted from 1.
+* I followed the mathematical model of a Quadrotor from 2.
 
-1. Ru, P.; Subbarao, K. Nonlinear Model Predictive Control for Unmanned Aerial Vehicles. Aerospace 2017, 4, 31. https://doi.org/10.3390/aerospace4020031
+1. A. Nash, S. Koenig and C. Tovey. Lazy Theta*: Any-Angle Path Planning and Path Length Analysis in 3D. In Proceedings of the AAAI Conference on Artificial Intelligence (AAAI), 2010.
+2. Ru, P.; Subbarao, K. Nonlinear Model Predictive Control for Unmanned Aerial Vehicles. Aerospace 2017, 4, 31. https://doi.org/10.3390/aerospace4020031
 
 
 
