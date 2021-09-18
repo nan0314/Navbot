@@ -31,6 +31,7 @@ These directions assume you have completed installation and setup of ROS Noetic 
 
 #### Simulation
 
+[Autonomous Flight Planning and Control](https://youtu.be/YIE2_jggq4w)
 Simulate the autnomous path planning and control by running the folowing command:
 
 `roslaunch navbot fly.launch`
