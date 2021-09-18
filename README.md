@@ -1,6 +1,6 @@
 # Autonomous Flight Planning and Control
 
-This repository contains packages that enable the autonomous flight planning and control of a simulated quadrotor system. It was inspired by the content in the Optimal and Learning Based Control course, [AA 203](http://asl.stanford.edu/aa203/).
+This repository contains packages that enable the autonomous flight planning and control of a simulated quadrotor system. It was inspired by the content in the Optimal and Learning Based Control course, [AA 203](http://asl.stanford.edu/aa203/). See Under The Hood.pdf for more information.
 
 ## Package List
 
