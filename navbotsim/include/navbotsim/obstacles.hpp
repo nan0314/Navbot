@@ -5,6 +5,7 @@
 #define OBSTACLES_INCLUDE_GUARD_HPP
 
 #include <geometry_msgs/Quaternion.h>
+#include "geometry_msgs/Pose.h"
 #include "std_msgs/ColorRGBA.h"
 #include "visualization_msgs/Marker.h"
 #include "visualization_msgs/MarkerArray.h"
@@ -44,6 +45,8 @@ namespace obstacles{
     /// \param
     /// \return marker array containing initial unknown obstacles
     visualization_msgs::MarkerArray unknown_obstacles(string frame, int random);
+
+    int check_obstacles(visualization_msgs::MarkerArray &known, visualization_msgs::MarkerArray &unknown, geometry_msgs::Pose navbot_pose);
 }
 
 #endif

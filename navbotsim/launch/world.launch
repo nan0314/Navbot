@@ -1,8 +1,13 @@
 <launch>
 
     <arg name="model" default="-d $(find navbotsim)/config/model.rviz"/>
-    <node name="world" pkg="navbotsim" type="world"/>
+    <arg name="world_frame" default="world"/>
+    <arg name="enable_replan" default="false"/>
 
+    <param name="world_frame" type="str" value="$(arg world_frame)"/>
+    <param name="enable_replan" type="bool" value="$(arg enable_replan)"/>
+
+    <node name="world" pkg="navbotsim" type="world"/>
     <node name="rviz" pkg="rviz" type="rviz" args="$(arg model)"/>
 
 

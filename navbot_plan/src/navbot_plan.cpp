@@ -2,6 +2,10 @@
 
 namespace navbot_plan{
 
+    using visualization_msgs::Marker;
+    using visualization_msgs::MarkerArray;
+    using std::stack;
+
     ///////////////////////////
     // Node Functions
     ///////////////////////////
@@ -270,6 +274,16 @@ namespace navbot_plan{
             // If current_node is the destination, then we are done.
             if (distance(current_node->pos,end) <= step){
                 end_node.parent = current_node;
+
+                double tempG = current_node->g + distance(current_node->pos,end);
+                // Theta* code
+                if (current_node->parent and current_node->parent->valid_successor(obstacles,end,step/5)){
+                    double cost = current_node->parent->g + distance(current_node->parent->pos,end);
+                    if (cost <= tempG){
+                        end_node.parent = current_node->parent;
+                        end_node.g = cost;
+                    }
+                }
                 break;
             }
 
@@ -311,7 +325,7 @@ namespace navbot_plan{
                     next_node->h = distance(successor,end);
                 }
 
-                // Theta* code -- not sure why ! is required but that's the only way to make it work
+                // Theta* code
                 if (current_node->parent and current_node->parent->valid_successor(obstacles,successor,step/5)){
                     double cost = current_node->parent->g + distance(current_node->parent->pos,successor);
                     if (cost <= tempG){
@@ -463,6 +477,37 @@ namespace navbot_plan{
         return path;
     }
 
+    void replan_path(const MarkerArray obstacles, const Marker &obstacle, nav_msgs::Path &replan_path,
+    const vector<double> &robot_pose, const vector<double> &goal, stack<vector<double>> &waypoints, const std::string &frame){
+
+        // convert new/observed obstacle into marker array for path intersection checking
+        std::cout << "yuh" << std::endl;
+        MarkerArray check;
+        check.markers.push_back(obstacle);
+
+        // create current navbot position and goal nodes
+        navbot_plan::Node navbot_node = navbot_plan::Node(robot_pose,nullptr);
+        navbot_plan::Node goal_node = navbot_plan::Node(goal,nullptr);
+
+        // create new path if necessary (path intersects new obstacle)
+        vector<vector<double>> new_path;
+        if (!navbot_node.valid_successor(check,goal,1)) {
+            std::cout << "here" << std::endl;
+            new_path = navbot_plan::theta_star(robot_pose,goal,obstacles,10);        
+        } else if (!goal_node.valid_successor(check,waypoints.top(),1)){
+            std::cout << "here" << std::endl;
+            new_path = navbot_plan::theta_star(robot_pose,waypoints.top(),obstacles,10);        
+        } else {
+            return;
+        }
+
+        for (int i = new_path.size()-1; i>0; i--){
+            waypoints.push(new_path[i]);
+        }
+
+        replan_path = nav_path(new_path,frame);
+
+    }
 
     nav_msgs::Path nav_path(const vector<vector<double>> &path, const std::string &frame){
 
@@ -486,4 +531,6 @@ namespace navbot_plan{
 
         return poses;
     }
+
+
 }

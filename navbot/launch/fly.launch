@@ -1,11 +1,13 @@
 <launch>
 
-    
+    <arg name="navbot_frame" default="navbot"/>
 
-    <node name="controller" pkg="navbot" type="pynavbot_fly.py" output="screen"/>
+    <param name="navbot_frame" value="$(arg navbot_frame)"/>
 
     <include file="$(find navbot_plan)/launch/plan.launch">
         <arg name="model" value="-d $(find navbot)/config/model.rviz"/>
     </include>
+
+    <node name="controller" pkg="navbot" type="pynavbot_fly.py" output="screen"/>
 
 </launch>

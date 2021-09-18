@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <set>
+#include <stack>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -18,6 +19,9 @@
 namespace navbot_plan{
 
     using std::vector;
+    using std::stack;
+    using visualization_msgs::Marker;
+    using visualization_msgs::MarkerArray;
 
     struct Node{
         
@@ -133,6 +137,9 @@ namespace navbot_plan{
     /// \return vector of points that form the optimal path
     vector<vector<double>> lazy_theta_star(const vector<double> &start, const vector<double> &end, 
     const visualization_msgs::MarkerArray &obstacles, const double &step);
+
+    void replan_path(const MarkerArray obstacles, const Marker &obstacle, nav_msgs::Path &replan_path,
+    const vector<double> &robot_pose, const vector<double> &goal, stack<vector<double>> &waypoints, const std::string &frame);
 
     /// \brief converts a path represented by a vector<vector<double>
     ///        into a nav_msgs::Path

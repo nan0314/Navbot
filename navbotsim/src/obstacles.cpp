@@ -3,6 +3,9 @@
 
 namespace obstacles{
 
+    using visualization_msgs::MarkerArray;
+    using visualization_msgs::Marker;
+
     visualization_msgs::Marker create(double x, double y, double z, double w, double l, double h, bool known, string frame, int id){
 
         visualization_msgs::Marker obstacle;
@@ -86,6 +89,42 @@ namespace obstacles{
         // }
 
         return unknown;
+    }
+
+    int check_obstacles(MarkerArray &known, MarkerArray &unknown, geometry_msgs::Pose navbot_pose){
+
+        for (int i = 0; i<unknown.markers.size(); i++){
+            Marker obstacle = unknown.markers[i];
+            if (obstacle.action != 0){
+                continue;
+            }
+            double magnitude = sqrt(pow(obstacle.scale.x,2) + pow(obstacle.scale.y,2));
+            double dx = obstacle.pose.position.x - navbot_pose.position.x;
+            double dy = obstacle.pose.position.y - navbot_pose.position.y;
+            double dist = sqrt(pow(dx,2) + pow(dy,2));
+
+            if (dist < 7 + magnitude){
+
+                visualization_msgs::Marker copy;
+                copy.header = obstacle.header;
+                copy.id = obstacle.id;
+                copy.type = obstacle.type;
+                copy.action = 0;
+                copy.pose = obstacle.pose;
+                copy.scale = obstacle.scale;
+                copy.color.b = 1;
+                copy.color.g = 1;
+                copy.color.a = 0.75;
+                unknown.markers[i].action = 2;
+                known.markers.push_back(copy);
+
+                return i;                
+            }
+
+        }
+
+        return -1;
+
     }
 
     

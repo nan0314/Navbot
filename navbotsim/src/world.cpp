@@ -12,79 +12,71 @@
 
 #include "ros/ros.h"
 #include "nav_msgs/Path.h"
-#include "geometry_msgs/Pose.h"
 #include "navbotsim/obstacles.hpp"
 #include "navbot_plan/replan.h"
 
 #include <iostream>
 #include <vector>
 
-ros::Publisher known_pub;
-ros::Publisher unknown_pub;
-visualization_msgs::MarkerArray unknown_msg;
-visualization_msgs::MarkerArray known_msg;
-static ros::ServiceClient client;
+static geometry_msgs::Pose pose;
+static bool pose_recieved = false;
 
 void pose_callback(nav_msgs::Path msg){
 
-    geometry_msgs::Pose pose = msg.poses[msg.poses.size()-1].pose;
-    int count = 0;
-    for (int i = 0; i<unknown_msg.markers.size(); i++){
-        visualization_msgs::Marker obstacle = unknown_msg.markers[i];
-        if (obstacle.action != 0){
-            continue;
-        }
-        double magnitude = sqrt(pow(obstacle.scale.x,2) + pow(obstacle.scale.y,2));
-        double dx = obstacle.pose.position.x - pose.position.x;
-        double dy = obstacle.pose.position.y - pose.position.y;
-        double dist = sqrt(pow(dx,2) + pow(dy,2));
-
-        if (dist < 7 + magnitude){
-            count++;
-            visualization_msgs::Marker copy;
-            copy.header = obstacle.header;
-            copy.id = obstacle.id;
-            copy.type = obstacle.type;
-            copy.action = 0;
-            copy.pose = obstacle.pose;
-            copy.scale = obstacle.scale;
-            copy.color.b = 1;
-            copy.color.g = 1;
-            copy.color.a = 0.75;
-            unknown_msg.markers[i].action = 2;
-            known_msg.markers.push_back(copy);
-
-
-            navbot_plan::replan srv;
-            srv.request.index = i;
-            client.call(srv);
-        }
-
-    }
+    pose = msg.poses[msg.poses.size()-1].pose;
+    pose_recieved = true;
 
 }
 
 int main(int argc, char **argv)
 {
+    using std::string;
     using std::vector;
+    using namespace obstacles;
 
+    // initialize node
     ros::init(argc, argv, "world");
-
     ros::NodeHandle n;
+    ros::Rate loop_rate(10);
 
+    // publishers and subscribers
     ros::Subscriber pose_sub = n.subscribe("navbot_path", 5, pose_callback);
-    known_pub = n.advertise<visualization_msgs::MarkerArray>("known_obstacles", 5);
-    unknown_pub = n.advertise<visualization_msgs::MarkerArray>("unknown_obstacles", 5);
-    client = n.serviceClient<navbot_plan::replan>("replan");
+    ros::Publisher known_pub = n.advertise<visualization_msgs::MarkerArray>("known_obstacles", 5);
+    ros::Publisher unknown_pub = n.advertise<visualization_msgs::MarkerArray>("unknown_obstacles", 5);
+    ros::ServiceClient client = n.serviceClient<navbot_plan::replan>("replan");
+
+
+    // get ros params
+    bool enable_replan;
+    string world_frame;
+    
+    ros::param::get("enable_replan", enable_replan);
+    ros::param::get("world_frame",world_frame);
 
     // create obstacles   
-    known_msg = obstacles::known_obstacles("world");
-    unknown_msg = obstacles::unknown_obstacles("world",10);   
-
-    ros::Rate loop_rate(10);
+    visualization_msgs::MarkerArray known_msg = known_obstacles(world_frame);
+    visualization_msgs::MarkerArray unknown_msg;
+    if (enable_replan){
+        unknown_msg = unknown_obstacles(world_frame,10); 
+    }
 
     while (ros::ok())
     {
+
+        // Check for new obstacles when navbot pose is recieved;
+        if (pose_recieved and enable_replan){
+
+            int obstacle_index = check_obstacles(known_msg,unknown_msg,pose);
+            if (obstacle_index >= 0){
+                known_pub.publish(known_msg);
+                unknown_pub.publish(unknown_msg);
+                navbot_plan::replan srv;
+                srv.request.index = obstacle_index;
+                client.call(srv);
+            }
+
+            pose_recieved = false;
+        }
 
         known_pub.publish(known_msg);
         unknown_pub.publish(unknown_msg);

@@ -17,17 +17,23 @@ from scipy.integrate import odeint
 from dynamics import navbot
 from MPC import MPC
 
+global world_frame
+global navbot_frame
+
 def handle_pose(x):
 
+    global world_frame
+    global navbot_frame
+    
     pose = PoseStamped()
-    pose.header.frame_id="world"
+    pose.header.frame_id=world_frame
 
     br = tf2_ros.TransformBroadcaster()
     t = TransformStamped()
 
     t.header.stamp = rospy.Time.now()
-    t.header.frame_id = "world"
-    t.child_frame_id = "navbot"
+    t.header.frame_id = world_frame
+    t.child_frame_id = navbot_frame
     t.transform.translation.x = x[0]
     t.transform.translation.y = x[1]
     t.transform.translation.z = x[2]
@@ -50,6 +56,7 @@ def handle_pose(x):
     return pose
 
 def goal_callback(msg):
+
     global goal
     global prev
 
@@ -60,16 +67,26 @@ def goal_callback(msg):
 
 
 def pynavbot_fly():
+
+    global world_frame
+    global navbot_frame
     global goal
     global prev
+
     rospy.init_node('pynavbot_fly', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
+
+    # publishers and subscribers
     path_pub = rospy.Publisher('navbot_path', Path, queue_size=10)
     rospy.Subscriber("waypoint", PointStamped, goal_callback)
 
+    # ros params
+    world_frame = rospy.get_param("world_frame")
+    navbot_frame = rospy.get_param("navbot_frame")
+
     path_msg = Path()
-    path_msg.header.frame_id = "world"
+    path_msg.header.frame_id = world_frame
 
     # initialize state and control
     xu =  [30,30,5,0,0,0,0,0,0,0,0,0,0,0,0,0]
